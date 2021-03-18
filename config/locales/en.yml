@@ -1,0 +1,8 @@
+en:
+  spina:
+    mounts:
+      new: "New %{mount}"
+      new_record: "%{mount} was created."
+      saved: Entry was saved.
+      delete_confirmation: "Are you sure you want to delete this entry?"
+      error: Entry coudn't be saved

@@ -1,0 +1,3 @@
+- current_theme.mounted_models.each_key do |model_name| 
+  %li{class: ('active' if %w[users].include? controller_name)}
+    = link_to model_name.upcase, spina.admin_mounts_path(model: model_name)

@@ -1,0 +1,20 @@
+- if current_spina_user.admin? or Spina.config.allow_creating_pages
+  %span{data: {dropdown: true}}
+    = link_to "#{spina.new_admin_mount_path}?model=#{@mounts.name.downcase}", class: 'button button-primary' do
+      .button-content
+        = icon('plus')
+        = t 'spina.mounts.new', mount: @mounts.name
+
+.well
+  .dd#mounts_list{data: {:"sort-url" => spina.sort_admin_pages_url }}
+    %ol.dd-list
+      - @mounts.each do |mount|
+        %li.dd-item{data: {id: mount.id}}
+          .dd-item-inner
+            = link_to "#{spina.edit_admin_mount_path(mount)}?model=#{@mounts.name.downcase}", class: 'button button-link button-small sortable-link' do
+              = mount[@attrs[0]]
+            %span.pull-right
+              = link_to "#{spina.edit_admin_mount_path(mount)}?model=#{@mounts.name.downcase}", class: 'button button-small button-default dd-nodrag' do
+                .button-content
+                  = icon('pencil-outline')
+                  = t('spina.edit')

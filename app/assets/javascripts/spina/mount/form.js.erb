@@ -1,0 +1,83 @@
+$(document).on('turbolinks:load', function(){
+
+  // Create the notification message.
+  function notification_flash(message){
+    var notification = "<aside id='notifications'><div class='notification animated fadeInLeft'><i class='icon icon-info'></i><div class='notification-message'>"
+    notification += message
+    return notification += "</div><a data-close-notification='true' href='#'><i class='icon icon-cross'></i></div></aside>"
+  };
+
+  // Create the notification message.
+  function alert_flash(messages){
+    var notification = "<aside id='notifications'><div class='notification notification-danger animated fadeInLeft'><i class='icon icon-exclamation'></i><div class='notification-message'><%= I18n.t('spina.mounts.error') %>"
+    $.each($.parseJSON(messages), function(key, message){
+      notification += "<small>• " + key + ' ' + message + "</small>"
+    });
+    return notification += "</div><a data-close-notification='true' href='#'><i class='icon icon-cross'></i></div></aside>"
+  };
+
+  // Get the ID of the current instance based on URL (if there is one)
+  function getID(){
+    var tmp = window.location.pathname.split('/admin/mounts/')[1];
+    var id  = tmp.split('/')[0];
+    return id;
+  };
+  
+  // Handle form CREATE and UPDATE via AJAX
+  $("#mount-form").on("submit",function(e){
+    e.preventDefault();
+
+    id = getID();
+
+    if (id == 'new'){
+      // Create an entry using AJAX
+      Rails.ajax({
+        url: "/" + $('#mount-form').data('model-p'),
+        type: "post",
+        data: Rails.serializeElement(Rails.$("form")[0]),
+        // Parse json with errors if there were validation errors
+        success: function(data){
+          window.location.replace("/admin/mounts/" + data['id'] + '/edit?model=' + $('#mount-form').data('model-s') + '&new_record=true')
+        },
+        error: function(errors) {
+          $('#main').append(alert_flash(errors));
+        }
+      });
+    // Existing entry
+    } else {
+      // Append the Rails PATCH tag
+      $('#mount-form').append('<input type="hidden" name="_method" value="patch">');
+      // Update an entry using AJAX
+      Rails.ajax({
+        url: "/" + $('#mount-form').data('model-p') + "/" + id,
+        type: "post",
+        data: Rails.serializeElement(Rails.$("form")[0]),
+        // Parse json with errors if there were validation errors
+        success: function(data){
+          $('#main').append(notification_flash("<%= I18n.t('spina.mounts.saved') %>"));
+        },
+        error: function(errors) {
+          $('#main').append(alert_flash(errors));
+        }
+      });
+    }
+    return false;
+  });
+
+  // Handle DELETE request to do correct redirecting
+  $('#delete-entry').on('click', function(e){
+    if(confirm("<%= I18n.t('spina.mounts.delete_confirmation') %>")){
+      id = getID();
+      Rails.ajax({
+        url: "/" + $('#mount-form').data('model-p') + "/" + id,
+        type: "delete",
+        success: function(data){
+          window.location.replace("/admin/mounts?model=" + $('#mount-form').data('model-s'));
+        },
+        error: function(errors) {
+          $('#main').append(alert_flash(errors));
+        }
+      });
+    }
+  });
+});

@@ -1,0 +1,60 @@
+#page_content.tab-content.active
+
+  .page-form
+
+    - # Make a request to the models controller. This allows to keep the logic 
+    - # within the app and only use the admin panel for the views.
+    - pluralized = @model.name.pluralize.downcase
+
+    = form_with scope: @model.name.downcase, local: false, data: {model_s: @model.name.downcase, model_p: pluralized}, id: 'mount-form' do |f|
+      %header#header
+        .breadcrumbs
+          = render_breadcrumbs separator: '<div class="divider"></div>'
+          %span{style: 'margin-left: 10px'}
+            - unless false #@m.new_record?
+              - if Spina.config.locales.size > 1
+                %div{style: "display: inline-block", data: {dropdown: true}}
+                  = link_to '#', class: 'button button-default button-small', style: 'margin-left: 0; margin-right: 0', data: {trigger: 'dropdown', target: '#locales'} do
+                    .button-content
+                      = icon('comment')
+                      =t "spina.languages.#{@locale}"
+                      %i.icon.icon-chevron-down{style: 'font-size: 9px; margin-right: 0; margin-left: 5px'}
+
+                  %ul#locales
+                    - Spina.config.locales.each do |locale|
+                      %li
+                        = link_to t("spina.languages.#{locale}"), "?locale=#{locale}", style: ('font-weight: 600' if @locale.to_s == locale.to_s).to_s
+
+        #header_actions
+          %button.button.button-primary{type: 'submit', style: 'margin-right: 0', data: {disable_with: t('spina.pages.saving')}}
+            = icon('check')
+            = t 'spina.save'
+
+      - # Create a field for every attribute of the entry based on the attributes class
+      - @attrs.each do |attribute|
+        .page-form-group
+          .page-form-label= attribute.capitalize
+          - case @model.columns_hash[attribute.to_s].type
+          - when :string
+            .page-form-control= f.text_field attribute, value: @mount[attribute]
+          - when :integer
+            = f.number_field attribute, value: @mount[attribute]
+          - when :datetime
+            = f.date_select attribute, value: @mount[attribute]
+            = f.time_select attribute, ignore_date: true, value: @mount[attribute]
+          - when :date
+            = f.date_field attribute, value: @mount[attribute]
+          - when :time
+            = f.time_field attribute, value: @mount[attribute]
+          - when :boolean
+            = f.check_box attribute, value: @mount[attribute]
+          - when ActionText::RichText
+            = render 'spina/admin/shared/rich_text_field', f: f, field: attribute
+          - else
+            - if current_spina_user.admin?
+              = "#{attribute} is of unknown type."
+
+    - unless @mount.new_record?
+      .text-right{style: "margin-top: 60px"}
+        #delete-entry.button.button-default.button-small.button-danger.pointer
+          = t('spina.permanently_delete')
