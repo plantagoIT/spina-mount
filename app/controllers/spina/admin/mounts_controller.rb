@@ -1,20 +1,22 @@
 module Spina
   module Admin
       class MountsController < AdminController
-        before_action :set_breadcrumbs
         before_action :verify_editable_model
         before_action :set_model
+        before_action :set_index_breadcrumb
 
         def index
           @mounts = @model.all.order(updated_at: :desc)
         end
 
         def new
+          add_breadcrumb t('spina.mounts.new', mount: @model.name), '#'
           @mount = @model.new
           @id    = @model.count == 0 ? 1 : @model.last.id + 1
         end
 
         def edit
+          add_breadcrumb t('spina.mounts.edit', mount: @model.name), '#'
           if params[:new_record] == 'true'
             flash.now[:notice] = t 'spina.mounts.new_record', mount: @model.name
           end
@@ -23,8 +25,8 @@ module Spina
 
         private
 
-          def set_breadcrumbs
-            add_breadcrumb params[:model].capitalize, admin_mounts_path(model: params[:model])
+          def set_index_breadcrumb
+            add_breadcrumb @model.name.pluralize.capitalize, admin_mounts_path(model: params[:model])
           end
 
           def set_model

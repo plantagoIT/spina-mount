@@ -1,9 +1,13 @@
-- if current_spina_user.admin? or Spina.config.allow_creating_pages
-  %span{data: {dropdown: true}}
-    = link_to "#{spina.new_admin_mount_path}?model=#{@mounts.name.downcase}", class: 'button button-primary' do
-      .button-content
-        = icon('plus')
-        = t 'spina.mounts.new', mount: @mounts.name
+%header#header
+  .breadcrumbs
+    = render_breadcrumbs separator: '<div class="divider"></div>'
+
+  #header_actions
+    %span{data: {dropdown: true}}
+      = link_to "#{spina.new_admin_mount_path}?model=#{@mounts.name.downcase}", class: 'button button-primary' do
+        .button-content
+          = icon('plus')
+          = t 'spina.mounts.new', mount: @mounts.name
 
 .well
   .dd#mounts_list{data: {:"sort-url" => spina.sort_admin_pages_url }}

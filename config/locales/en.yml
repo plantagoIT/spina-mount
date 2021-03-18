@@ -2,6 +2,7 @@ en:
   spina:
     mounts:
       new: "New %{mount}"
+      edit: "Edit %{mount}"
       new_record: "%{mount} was created."
       saved: Entry was saved.
       delete_confirmation: "Are you sure you want to delete this entry?"
